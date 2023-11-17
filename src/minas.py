@@ -9,20 +9,21 @@ Guia de numeros del tablero:
 0 = Sin descubrir
 1 = hay una bomba
 2 = descubierto
-3 = bandera
 
 """
 
 import random
 
-def descubrirCeldasAdyacentes(tablero, posicion): 
+def descubrirCeldasAdyacentes(tablero, posicion, descubiertas): 
    # posicion_tablero = tablero[posicion[0]][posicion[1]]
+    try:
+        for fila in range(-1, 2):
+            for columna in range(-1, 2):
+                if tablero[posicion[0]+fila][posicion[1]+columna] == 0:
+                    descubiertas.append((posicion[0]+fila, posicion[1]+columna))
+    except IndexError:
+        pass
     
-    for fila in range(-1, 2):
-        for columna in range(-1, 2):
-            if tablero[posicion[0]+fila][posicion[1]+columna] == 0:
-                tablero[posicion[0]+fila][posicion[1]+columna] = 2
-
 def pidePosicion():
     l_mina = []
     mina = input("Ingresa coordenadas (fila, columna):")
@@ -47,21 +48,21 @@ def generarTablero():
     for fila in range(8):
         tablero.append([0, 0, 0, 0 ,0, 0, 0, 0])
     return tablero
-
+"""
 def inicializaTablero():
     tablero = generarTablero()
     minas = generaMinas(10)
     for mina in minas:
         tablero[mina[0]][mina[1]] = 1
     return tablero
-
-def compruebaMina(tablero, posicion):
-    if tablero[posicion[0]][posicion[1]] == 1:
+"""
+def compruebaMina(minas, posicion):
+    if posicion in minas:
         return True
     else:
         return False
-            
-def imprimirTablero(tablero):
+"""
+def imprimirTablero(tablero, minas):
     print(end="\t")
     for numero in range(1, len(tablero)+1):
         print(numero, end="\t")
@@ -73,28 +74,58 @@ def imprimirTablero(tablero):
                 print(" ", end="\t")
             else:
                 print("·", end="\t")
+        print("\n")"""
+        
+def imprimirTablero(tablero, minas, descubiertos, banderas):
+    print(end="\t")
+    for numero in range(1, len(tablero)+1):
+        print(numero, end="\t")
+    print("\n")
+    for fila in range(1, len(tablero)+1):
+        print(fila, end="\t")
+        for celda in range(1, len(tablero)+1):
+            if (fila, celda) in banderas:
+                print("F", end="\t")
+            elif (fila, celda) in minas:
+                print("·", end="\t")
+            elif (fila, celda) in descubiertos:
+                print(" ", end="\t")
+            
+            else: 
+                print("·", end="\t")
         print("\n")
-        
-        
+
 def jugar():
     """
     Esta función ejecuta el juego.
 
     """
-    tablero = inicializaTablero()
-    imprimirTablero(tablero)
+#    tablero_visible = generarTablero()
+    descubiertas = []
+    tablero = generarTablero()
+    minas = generaMinas(10)
+    banderas = []
+    imprimirTablero(tablero, minas, descubiertas, banderas)
         
     entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
     while entrada != "3":
-            mina = pidePosicion()
-            if compruebaMina(tablero, mina):
+        if entrada == "1":    
+            posicion = pidePosicion()
+            if compruebaMina(minas, posicion):
                 print("Has perdido")
                 quit()
             else:
-                tablero[mina[0]][mina[1]] = 2
-                descubrirCeldasAdyacentes(tablero, mina)
-                imprimirTablero(tablero)
+                descubiertas.append((posicion[0]+1, posicion[1]+1))
+                descubrirCeldasAdyacentes(tablero, (posicion[0]+1, posicion[1]+1), descubiertas)
+                imprimirTablero(tablero, minas, descubiertas, banderas)
                 entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
+        if entrada == "2":
+            posicion = pidePosicion()
+            banderas.append((posicion[0]+1, posicion[1]+1))
+            imprimirTablero(tablero, minas, descubiertas, banderas)
+            entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
+            
+                
                 
 if __name__ == "__main__":
     """
