@@ -15,7 +15,15 @@ Guia de numeros del tablero:
 
 import random
 
-def pideMina():
+def descubrirCeldasAdyacentes(tablero, posicion): 
+   # posicion_tablero = tablero[posicion[0]][posicion[1]]
+    
+    for fila in range(-1, 2):
+        for columna in range(-1, 2):
+            if tablero[posicion[0]+fila][posicion[1]+columna] == 0:
+                tablero[posicion[0]+fila][posicion[1]+columna] = 2
+
+def pidePosicion():
     l_mina = []
     mina = input("Ingresa coordenadas (fila, columna):")
     mina = mina.split(",")
@@ -54,17 +62,17 @@ def compruebaMina(tablero, posicion):
         return False
             
 def imprimirTablero(tablero):
-    print(end=" ")
+    print(end="\t")
     for numero in range(1, len(tablero)+1):
-        print(numero, end=" ")
+        print(numero, end="\t")
     print("\n")
     for numero in range(1, len(tablero)+1):
-        print(numero , end=" ")
+        print(numero , end="\t")
         for celda in tablero[numero-1]:
             if celda == 2:
-                print(" ", end=" ")
+                print(" ", end="\t")
             else:
-                print("·", end=" ")
+                print("·", end="\t")
         print("\n")
         
         
@@ -76,19 +84,18 @@ def jugar():
     tablero = inicializaTablero()
     imprimirTablero(tablero)
         
-    entrada = input("""Elige una acción:
-                    1. Revelar celda
-                    2. Marcar celda
-                    3. Salir""")
+    entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
     while entrada != "3":
-        if entrada == "1":
-            mina = pideMina()
+            mina = pidePosicion()
             if compruebaMina(tablero, mina):
+                print("Has perdido")
                 quit()
             else:
                 tablero[mina[0]][mina[1]] = 2
+                descubrirCeldasAdyacentes(tablero, mina)
                 imprimirTablero(tablero)
-
+                entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
+                
 if __name__ == "__main__":
     """
     Esta sección del código se ejecuta solo si ejecutamos este archivo directamente.
