@@ -4,12 +4,6 @@ En esta solución, se ha estructurado el código para que sea claro y fácil de 
 Notas Adicionales
 La función revelar_celdas_vacias y verificar_victoria necesitan ser implementadas según las reglas del Buscaminas.
 Este ejercicio es una excelente manera de evaluar y mejorar las habilidades de programación de tus alumnos, enfocándose en las estructuras de datos y el manejo de lógica básica en Python.
-
-Guia de numeros del tablero:
-0 = Sin descubrir
-1 = hay una bomba
-2 = descubierto
-
 """
 
 import random
@@ -20,7 +14,7 @@ def descubrirCeldasAdyacentes(tablero, posicion, descubiertas):
         for fila in range(-1, 2):
             for columna in range(-1, 2):
                 if tablero[posicion[0]+fila][posicion[1]+columna] == 0:
-                    descubiertas.append((posicion[0]+fila, posicion[1]+columna))
+                    descubiertas.add((posicion[0]+fila, posicion[1]+columna))
     except IndexError:
         pass
     
@@ -99,6 +93,18 @@ def imprimirTablero(tablero, minas, descubiertos, banderas):
             else: 
                 print("·", end="\t")
         print("\n")
+        
+def compruebaGanar(minas, banderas, descubiertos, tablero: list):
+    tablero_set = set()
+    if minas == banderas:
+        
+        for fila in range(len(tablero)):
+            for celda in range(len(tablero)):
+                tablero_set.add((fila, celda))
+        tablero_set = tablero_set - minas
+        if tablero_set == descubiertos:
+            return True
+    return False
 
 def jugar():
     """
@@ -106,7 +112,7 @@ def jugar():
 
     """
 #    tablero_visible = generarTablero()
-    descubiertas = []
+    descubiertas = set()
     tablero = generarTablero()
     minas = generaMinas(10)
     banderas = []
@@ -118,23 +124,30 @@ def jugar():
             posicion = pidePosicion()
             if compruebaMina(minas, posicion):
                 print("Has perdido")
-                quit()
+                return False
             else:
-                descubiertas.append((posicion[0]+1, posicion[1]+1))
+                descubiertas.add((posicion[0]+1, posicion[1]+1))
                 descubrirCeldasAdyacentes(tablero, (posicion[0]+1, posicion[1]+1), descubiertas)
                 imprimirTablero(tablero, minas, descubiertas, banderas)
+                if compruebaGanar(minas, banderas, descubiertas, tablero):
+                    print("has ganado")
+                    return True
                 entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
         if entrada == "2":
             posicion = pidePosicion()
             banderas.append((posicion[0]+1, posicion[1]+1))
             imprimirTablero(tablero, minas, descubiertas, banderas)
+            if compruebaGanar(minas, banderas, descubiertas, tablero):
+                print("has ganado")
+                return True
             entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
-            
+        else:
+            print("Opcion invalida")
+            entrada = input("Elige una acción:\n1. Revelar celda\n2. Marcar celda\n3. Salir")
                 
                 
 if __name__ == "__main__":
     """
     Esta sección del código se ejecuta solo si ejecutamos este archivo directamente.
     """
-    
     jugar()
